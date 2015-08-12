@@ -1,4 +1,3 @@
-//GOL's Game engine
 #include <engine.h>
 
 #define BALL_SIZE (4)
