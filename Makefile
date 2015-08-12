@@ -6,7 +6,7 @@ OBJ = engine.o main.o
 V = 1.0
 
 #Complete and clean compilation
-all: pong clean
+all: pong 
 
 #THE game
 pong: $(OBJ)
