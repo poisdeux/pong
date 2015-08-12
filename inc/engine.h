@@ -8,6 +8,8 @@
 
 //Colors
 #define C_WHITE makecol(255,255,255)
+#define C_BLUE makecol(100,100,255)
+#define C_RED makecol(255,100,100)
 #define C_BLACK makecol(0,0,0)
 
 extern int end_game,
