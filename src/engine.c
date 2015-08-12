@@ -211,8 +211,8 @@ void output()
 	
 	//Draw Score
 	extern FONT *font;
-	textprintf_ex(buffer,font, 64, 4,C_WHITE, -1, "%d", score_P1);
-	textprintf_ex(buffer,font, SCREEN_W-64, 4,C_WHITE, -1, "%d", score_P2);
+	textprintf_ex(buffer,font, 64, 4,C_GREEN, -1, "%d", score_P1);
+	textprintf_ex(buffer,font, SCREEN_W-64, 4,C_GREEN, -1, "%d", score_P2);
 	
 	//Debugger
 	//textprintf_ex(buffer, font, 4, 4, C_WHITE, -1, "Ball Speed: %f, %f", ball_hspeed, ball_vspeed);
