@@ -203,8 +203,8 @@ void output()
 	}
 	
 	//Draw Paddles
-	rectfill(buffer, 31, P1_y - paddle_size/2, 31+(paddle_width-1), P1_y + paddle_size/2, C_WHITE);
-	rectfill(buffer, SCREEN_W - 31, P2_y - paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + paddle_size/2, C_WHITE);
+	rectfill(buffer, 31, P1_y - paddle_size/2, 31+(paddle_width-1), P1_y + paddle_size/2, C_BLUE);
+	rectfill(buffer, SCREEN_W - 31, P2_y - paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + paddle_size/2, C_RED);
 	
 	//Draw Ball
 	circlefill(buffer, ball_x, ball_y, BALL_SIZE/2, C_WHITE);
