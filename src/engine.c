@@ -3,7 +3,7 @@
 #define BALL_SIZE (4)
 #define VERSION "1.0"
 
-int end_game, timer;
+int end_game, game_over, timer;
 BITMAP* buffer;
 SAMPLE *bump_bleep, *match_bleep;
 
@@ -18,7 +18,9 @@ static float ball_hspeed,
 	ball_vspeed;
 
 //Game Options
-static int paddle_size,
+static int left_paddle_size,
+	right_paddle_size,
+	paddle_size,
 	paddle_width,
 	paddle_speed,
 	ball_speed,
@@ -38,9 +40,8 @@ void init(int argc, char** argv)
 	char x;
 	int width = 640,
 		height = 480;
-	
+	paddle_size = 64;	
 	speed = 1.0;
-	paddle_size = 64;
 	paddle_width = 4;
 	paddle_speed = 3;
 	ball_speed = 3;
@@ -77,6 +78,8 @@ void init(int argc, char** argv)
 				return;
 		}
 	}
+	
+	right_paddle_size = left_paddle_size = paddle_size;
 	//initialize game components	
 	config(width, height);
 	
@@ -140,7 +143,7 @@ void start()
 	install_int(tick, 1000/100/speed);
 	fprintf(stderr, "Timer routines set up succesfully!\n");
 		
-	end_game = 0;
+	end_game = game_over = 0;
 }
 
 //Game Loop Functions
@@ -166,11 +169,11 @@ void input()
 	}
 	
 	//P1 Controls
-	if (key[KEY_UP] && P1_y >= paddle_size/2)
+	if (key[KEY_UP] && P1_y >= left_paddle_size/2)
 	{
 		P1_y -= paddle_speed;
 	}
-	if (key[KEY_DOWN] && P1_y <= (SCREEN_H-paddle_size/2))
+	if (key[KEY_DOWN] && P1_y <= (SCREEN_H-left_paddle_size/2))
 	{
 		P1_y += paddle_speed;
 	}
@@ -178,11 +181,11 @@ void input()
 	//P2 Controls
 	if (two_player)
 	{
-		if (key[KEY_A] && P2_y >= paddle_size/2)
+		if (key[KEY_A] && P2_y >= right_paddle_size/2)
 		{
 			P2_y -= paddle_speed;
 		}
-		if (key[KEY_Z] && P1_y <= (SCREEN_H-paddle_size/2))
+		if (key[KEY_Z] && P1_y <= (SCREEN_H-right_paddle_size/2))
 		{
 			P2_y += paddle_speed;
 		}
@@ -203,8 +206,8 @@ void output()
 	}
 	
 	//Draw Paddles
-	rectfill(buffer, 31, P1_y - paddle_size/2, 31+(paddle_width-1), P1_y + paddle_size/2, C_BLUE);
-	rectfill(buffer, SCREEN_W - 31, P2_y - paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + paddle_size/2, C_RED);
+	rectfill(buffer, 31, P1_y - left_paddle_size/2, 31+(paddle_width-1), P1_y + left_paddle_size/2, C_BLUE);
+	rectfill(buffer, SCREEN_W - 31, P2_y - right_paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + right_paddle_size/2, C_RED);
 	
 	//Draw Ball
 	circlefill(buffer, ball_x, ball_y, BALL_SIZE/2, C_WHITE);
@@ -213,7 +216,11 @@ void output()
 	extern FONT *font;
 	textprintf_ex(buffer,font, 64, 4,C_GREEN, -1, "%d", score_P1);
 	textprintf_ex(buffer,font, SCREEN_W-64, 4,C_GREEN, -1, "%d", score_P2);
-	
+
+	if (game_over) {
+		textprintf_centre_ex(buffer,font, SCREEN_W/2, SCREEN_H/2,C_WHITE, -1, "GAME OVER");
+	}
+
 	//Debugger
 	//textprintf_ex(buffer, font, 4, 4, C_WHITE, -1, "Ball Speed: %f, %f", ball_hspeed, ball_vspeed);
 	
@@ -227,7 +234,7 @@ void game_loop()
 	
 	//check for "restart" and "end" signals
 	if (end_game) return;
-		
+
 	//Check collision with walls
 	if (ball_y <= BALL_SIZE || ball_y >= SCREEN_H - BALL_SIZE)
 	{
@@ -238,23 +245,23 @@ void game_loop()
 	}
 	
 	//collision with paddles
-	if (ball_x <= (31+paddle_width*2-1) && ball_x >= 31 && ball_y >= P1_y - paddle_size/2 && ball_y <= P1_y + paddle_size/2)
+	if (ball_x <= (31+paddle_width*2-1) && ball_x >= 31 && ball_y >= P1_y - left_paddle_size/2 && ball_y <= P1_y + left_paddle_size/2)
 	{
 		play_sample(bump_bleep,128,128,1000,0);
 		
 		ball_hspeed = -ball_hspeed;
-		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball_y-P1_y)/(paddle_size/2)));
+		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball_y-P1_y)/(left_paddle_size/2)));
 		ball_hspeed = (ball_hspeed/abs(ball_hspeed)) * ball_speed * cos(asin(ball_vspeed/ball_speed));
 		
 		ball_x += ball_hspeed;
 	}
 	
-	if (ball_x >= SCREEN_W-(31+paddle_width*2-1) && ball_x <= SCREEN_W-31 && ball_y >= P2_y - paddle_size/2 && ball_y <= P2_y + paddle_size/2)
+	if (ball_x >= SCREEN_W-(31+paddle_width*2-1) && ball_x <= SCREEN_W-31 && ball_y >= P2_y - right_paddle_size/2 && ball_y <= P2_y + right_paddle_size/2)
 	{
 		play_sample(bump_bleep,128,128,1000,0);
 		
 		ball_hspeed = -ball_hspeed;
-		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball_y-P2_y)/(paddle_size/2)));
+		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball_y-P2_y)/(right_paddle_size/2)));
 		ball_hspeed = (ball_hspeed/abs(ball_hspeed)) * ball_speed * cos(asin(ball_vspeed/ball_speed));
 		
 		ball_x += ball_hspeed;
@@ -265,6 +272,7 @@ void game_loop()
 	{
 		play_sample(match_bleep,128,128,1000,0);
 		score_P2++;
+		left_paddle_size -= 2;
 		ball_x = SCREEN_W/2;
 		ball_y = SCREEN_H/2;
 	}
@@ -273,26 +281,34 @@ void game_loop()
 	{
 		play_sample(match_bleep,128,128,1000,0);
 		score_P1++;
+		right_paddle_size -= 2;
 		ball_x = SCREEN_W/2;
 		ball_y = SCREEN_H/2;
 	}
-	
+
+	if ((left_paddle_size < 2) || (right_paddle_size < 2)) 
+	{
+		game_over = 1;
+	}
+
 	if (!two_player)
 	{
 		//AI... not so smart, kay?
 		if (ball_hspeed > 0 && ball_x >= (SCREEN_W - SCREEN_W/4 * (ball_hspeed/ball_speed)))
 		{
-			if (ball_y > (P2_y + paddle_size/2) && P2_y < (SCREEN_H - paddle_size/2))
+			if (ball_y > (P2_y + right_paddle_size/2) && P2_y < (SCREEN_H - right_paddle_size/2))
 				P2_y += paddle_speed;
-			else if (ball_y < (P2_y - paddle_size/2) && P2_y > paddle_size/2)
+			else if (ball_y < (P2_y - right_paddle_size/2) && P2_y > right_paddle_size/2)
 				P2_y -= paddle_speed;
 		}
 	}
-	
-	//Move ball	
-	ball_x += ball_hspeed;
-	ball_y += ball_vspeed;
-		
+
+	if( !game_over) {	
+		//Move ball	
+		ball_x += ball_hspeed;
+		ball_y += ball_vspeed;
+	}
+
 	output();
 }
 
