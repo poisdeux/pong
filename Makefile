@@ -22,10 +22,7 @@ engine.o: src/engine.c inc/engine.h
 #utilities
 #clean: clear object files and backup files
 clean:
-	rm -f *.o *~ 2> /dev/null
-#clear: clear all the compilation
-clear: clean
-	rm -f pong-$V 2> /dev/null
+	git clean -f -x
 
 #tar
 #create tarball
