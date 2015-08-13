@@ -3,7 +3,7 @@ ALLEGROLIBS = `allegro-config --cflags`
 CFLAGS = -I/usr/include -I./inc -Wall $(ALLEGROLIBS)
 DEBUG = -pg -ggdb
 OBJ = engine.o main.o
-V = 1.0
+V = 1.1
 
 #Complete and clean compilation
 all: pong 
