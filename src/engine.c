@@ -225,12 +225,12 @@ void output()
 	
 	//Draw Paddles
 	//Hide or show left paddle
-	if( (ball_x - P1_x) < paddle_visible_distance )
+	if( (ball_x - 31) < paddle_visible_distance )
 	{		
 		rectfill(buffer, 31, P1_y - left_paddle_size/2, 31+(paddle_width-1), P1_y + left_paddle_size/2, C_BLUE);
 	}
 
-	if( (P2_x - ball_x) < paddle_visible_distance )
+	if( (31 - ball_x) < paddle_visible_distance )
 	{
 		rectfill(buffer, SCREEN_W - 31, P2_y - right_paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + right_paddle_size/2, C_RED);
 	}
