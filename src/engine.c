@@ -20,6 +20,8 @@ static float ball_hspeed,
 //Game Options
 static int left_paddle_size,
 	right_paddle_size,
+	paddle_visible_distance,
+	paddle_visible_distance_opt,
 	paddle_size,
 	paddle_width,
 	paddle_speed,
@@ -41,13 +43,14 @@ void init(int argc, char** argv)
 	int width = 640,
 		height = 480;
 	paddle_size = 64;	
+	paddle_visible_distance_opt = 0;
 	speed = 1.0;
 	paddle_width = 4;
 	paddle_speed = 3;
 	ball_speed = 3;
 	two_player = 0;
 	
-	while((x = getopt(argc,argv,"w:h:s:p:2H")) != -1)
+	while((x = getopt(argc,argv,"w:h:s:p:d:2H")) != -1)
 	{
 		switch(x)
 		{
@@ -63,6 +66,9 @@ void init(int argc, char** argv)
 			case 'p': //paddle size
 				sscanf(optarg,"%d", &paddle_size);
 				break;
+			case 'd': //ball distance at which paddle will be visible
+				sscanf(optarg,"%d", &paddle_visible_distance_opt);
+				break;
 			case '2': //2P mode activated
 				two_player = 1;
 				break;
@@ -73,12 +79,18 @@ void init(int argc, char** argv)
 				printf("\t-h H: defines the window width to H (default: 480)\n");
 				printf("\t-s S: defines the game speed to factor S (default: 1.0)\n");
 				printf("\t-p P: defines the size of the paddle to O (default: 64)\n");
+				printf("\t-d D: defines the distance in pixels between ball and paddle at which the paddle will be visible (default: window width)\n");
 				printf("\t-2: enables 2-player mode\n");
 				printf("\t-H: prints this help.\n");
 				return;
 		}
 	}
-	
+
+	if(paddle_visible_distance_opt < 0)
+	{
+		paddle_visible_distance_opt = 0;
+	}
+
 	right_paddle_size = left_paddle_size = paddle_size;
 	//initialize game components	
 	config(width, height);
@@ -128,6 +140,12 @@ void init_gfx(int w, int h)
 //For future plans: menu
 void start()
 {
+	if(paddle_visible_distance_opt > 0) {
+		paddle_visible_distance = paddle_visible_distance_opt;
+	} else {
+		paddle_visible_distance = SCREEN_W;
+	}
+
 	P1_y = P2_y = ball_y = SCREEN_H/2;
 	score_P1 = score_P2 = 0;
 	ball_x = SCREEN_W/2;
@@ -206,9 +224,17 @@ void output()
 	}
 	
 	//Draw Paddles
-	rectfill(buffer, 31, P1_y - left_paddle_size/2, 31+(paddle_width-1), P1_y + left_paddle_size/2, C_BLUE);
-	rectfill(buffer, SCREEN_W - 31, P2_y - right_paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + right_paddle_size/2, C_RED);
-	
+	//Hide or show left paddle
+	if( (ball_x - P1_x) < paddle_visible_distance )
+	{		
+		rectfill(buffer, 31, P1_y - left_paddle_size/2, 31+(paddle_width-1), P1_y + left_paddle_size/2, C_BLUE);
+	}
+
+	if( (P2_x - ball_x) < paddle_visible_distance )
+	{
+		rectfill(buffer, SCREEN_W - 31, P2_y - right_paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + right_paddle_size/2, C_RED);
+	}
+
 	//Draw Ball
 	circlefill(buffer, ball_x, ball_y, BALL_SIZE/2, C_WHITE);
 	
@@ -217,10 +243,11 @@ void output()
 	textprintf_ex(buffer,font, 64, 4,C_GREEN, -1, "%d", score_P1);
 	textprintf_ex(buffer,font, SCREEN_W-64, 4,C_GREEN, -1, "%d", score_P2);
 
-	if (game_over) {
+	if (game_over) 
+	{
 		textprintf_centre_ex(buffer,font, SCREEN_W/2, SCREEN_H/2,C_WHITE, -1, "GAME OVER");
 	}
-
+	
 	//Debugger
 	//textprintf_ex(buffer, font, 4, 4, C_WHITE, -1, "Ball Speed: %f, %f", ball_hspeed, ball_vspeed);
 	
