@@ -9,23 +9,35 @@ SAMPLE *bump_bleep, *match_bleep;
 
 char allegro_error[ALLEGRO_ERROR_SIZE];
 
+typedef struct position position;
+
+struct position {
+  int x;
+  int y;
+};
+
+static position ball;
+
+typedef struct paddle paddle;
+
+struct paddle {
+	int height;
+	int width;
+	int speed;
+	position pos;
+};
+
+static paddle player1; 
+static paddle player2;
+
 //Game Vars
-static int P1_y, //Center position of Player 1
-	P2_y, //Center position of Player 2
-	ball_x, ball_y, //Center position of ball
-	score_P1, score_P2;
+static int paddle_visible_distance, score_P1, score_P2;
 static float ball_hspeed,
+	
 	ball_vspeed;
 
 //Game Options
-static int left_paddle_size,
-	right_paddle_size,
-	paddle_visible_distance,
-	paddle_visible_distance_opt,
-	paddle_size,
-	paddle_width,
-	paddle_speed,
-	ball_speed,
+static int ball_speed,
 	two_player;
 static float speed;
 
@@ -42,11 +54,10 @@ void init(int argc, char** argv)
 	char x;
 	int width = 640,
 		height = 480;
-	paddle_size = 64;	
-	paddle_visible_distance_opt = 0;
+	int opt_paddle_size = 64;
+
+	paddle_visible_distance = -1;
 	speed = 1.0;
-	paddle_width = 4;
-	paddle_speed = 3;
 	ball_speed = 3;
 	two_player = 0;
 	
@@ -64,10 +75,10 @@ void init(int argc, char** argv)
 				sscanf(optarg,"%f",&speed);
 				break;
 			case 'p': //paddle size
-				sscanf(optarg,"%d", &paddle_size);
+				sscanf(optarg,"%d", &opt_paddle_size);
 				break;
 			case 'd': //ball distance at which paddle will be visible
-				sscanf(optarg,"%d", &paddle_visible_distance_opt);
+				sscanf(optarg,"%d", &paddle_visible_distance);
 				break;
 			case '2': //2P mode activated
 				two_player = 1;
@@ -86,12 +97,10 @@ void init(int argc, char** argv)
 		}
 	}
 
-	if(paddle_visible_distance_opt < 0)
-	{
-		paddle_visible_distance_opt = 0;
-	}
+	player1.height = player2.height = opt_paddle_size;
+	player1.width = player2.width = 4;
+	player1.speed = player2.speed = 3;
 
-	right_paddle_size = left_paddle_size = paddle_size;
 	//initialize game components	
 	config(width, height);
 	
@@ -140,15 +149,15 @@ void init_gfx(int w, int h)
 //For future plans: menu
 void start()
 {
-	if(paddle_visible_distance_opt > 0) {
-		paddle_visible_distance = paddle_visible_distance_opt;
-	} else {
+	if(paddle_visible_distance < 0) {
 		paddle_visible_distance = SCREEN_W;
 	}
 
-	P1_y = P2_y = ball_y = SCREEN_H/2;
+	player1.pos.x = 31;
+	player2.pos.x = SCREEN_W - 31;
+	player1.pos.y = player2.pos.y = ball.y = SCREEN_H/2;
 	score_P1 = score_P2 = 0;
-	ball_x = SCREEN_W/2;
+	ball.x = SCREEN_W/2;
 	
 	srand(time(NULL));
 	float dir = ((float)(rand()%9100-4600)/100) * (PI/180); //0 <= dir < 2*PI
@@ -187,25 +196,25 @@ void input()
 	}
 	
 	//P1 Controls
-	if (key[KEY_UP] && P1_y >= left_paddle_size/2)
+	if (key[KEY_UP] && player1.pos.y >= player1.height/2)
 	{
-		P1_y -= paddle_speed;
+		player1.pos.y -= player1.speed;
 	}
-	if (key[KEY_DOWN] && P1_y <= (SCREEN_H-left_paddle_size/2))
+	if (key[KEY_DOWN] && player1.pos.y <= (SCREEN_H-player1.height/2))
 	{
-		P1_y += paddle_speed;
+		player1.pos.y += player1.speed;
 	}
 	
 	//P2 Controls
 	if (two_player)
 	{
-		if (key[KEY_A] && P2_y >= right_paddle_size/2)
+		if (key[KEY_A] && player2.pos.y >= player2.height/2)
 		{
-			P2_y -= paddle_speed;
+			player2.pos.y -= player2.speed;
 		}
-		if (key[KEY_Z] && P1_y <= (SCREEN_H-right_paddle_size/2))
+		if (key[KEY_Z] && player1.pos.y <= (SCREEN_H-player2.height/2))
 		{
-			P2_y += paddle_speed;
+			player1.pos.y += player2.speed;
 		}
 	}
 }
@@ -225,18 +234,18 @@ void output()
 	
 	//Draw Paddles
 	//Hide or show left paddle
-	if( (ball_x - 31) < paddle_visible_distance )
+	if( (ball.x - player1.pos.x) < paddle_visible_distance )
 	{		
-		rectfill(buffer, 31, P1_y - left_paddle_size/2, 31+(paddle_width-1), P1_y + left_paddle_size/2, C_BLUE);
+		rectfill(buffer, player1.pos.x, player1.pos.y - player1.height/2, player1.pos.x + player1.width, player1.pos.y + player1.height/2, C_BLUE);
 	}
 
-	if( ((SCREEN_W - 31) - ball_x) < paddle_visible_distance )
+	if( (player2.pos.x - ball.x) < paddle_visible_distance )
 	{
-		rectfill(buffer, SCREEN_W - 31, P2_y - right_paddle_size/2, SCREEN_W - 31 - (paddle_width-1), P2_y + right_paddle_size/2, C_RED);
+		rectfill(buffer, player2.pos.x, player2.pos.y - player2.height/2, player2.pos.x - player2.width, player2.pos.y + player2.height/2, C_RED);
 	}
 
 	//Draw Ball
-	circlefill(buffer, ball_x, ball_y, BALL_SIZE/2, C_WHITE);
+	circlefill(buffer, ball.x, ball.y, BALL_SIZE/2, C_WHITE);
 	
 	//Draw Score
 	extern FONT *font;
@@ -263,57 +272,59 @@ void game_loop()
 	if (end_game) return;
 
 	//Check collision with walls
-	if (ball_y <= BALL_SIZE || ball_y >= SCREEN_H - BALL_SIZE)
+	if (ball.y <= BALL_SIZE || ball.y >= SCREEN_H - BALL_SIZE)
 	{
 		play_sample(bump_bleep,128,128,1000,0);
 		
 		ball_vspeed = -ball_vspeed;
-		ball_y = (ball_y > SCREEN_H/2? SCREEN_H-(BALL_SIZE*2): BALL_SIZE*2);
+		ball.y = (ball.y > SCREEN_H/2? SCREEN_H-(BALL_SIZE*2): BALL_SIZE*2);
 	}
 	
 	//collision with paddles
-	if (ball_x <= (31+paddle_width*2-1) && ball_x >= 31 && ball_y >= P1_y - left_paddle_size/2 && ball_y <= P1_y + left_paddle_size/2)
+	if (ball.x < (player1.pos.x+player1.width*2) && ball.x > player1.pos.x && ball.y >= player1.pos.y - player1.height/2 && ball.y <= player1.pos.y + player1.height/2)
 	{
 		play_sample(bump_bleep,128,128,1000,0);
 		
 		ball_hspeed = -ball_hspeed;
-		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball_y-P1_y)/(left_paddle_size/2)));
+		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball.y-player1.pos.y)/(player1.height/2)));
 		ball_hspeed = (ball_hspeed/abs(ball_hspeed)) * ball_speed * cos(asin(ball_vspeed/ball_speed));
 		
-		ball_x += ball_hspeed;
+		ball.x += ball_hspeed;
 	}
+
+//	if (ball.x >= SCREEN_W-(31+paddle_width*2-1) && ball.x <= SCREEN_W-31 && ball.y >= player2.y - right_paddle_size/2 && ball.y <= player2.y + right_paddle_size/2)	
 	
-	if (ball_x >= SCREEN_W-(31+paddle_width*2-1) && ball_x <= SCREEN_W-31 && ball_y >= P2_y - right_paddle_size/2 && ball_y <= P2_y + right_paddle_size/2)
+	if (ball.x > (player2.pos.x-(player2.width*2)) && ball.x < player2.pos.x && ball.y >= player2.pos.y - player2.height/2 && ball.y <= player2.pos.y + player2.height/2)
 	{
 		play_sample(bump_bleep,128,128,1000,0);
 		
 		ball_hspeed = -ball_hspeed;
-		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball_y-P2_y)/(right_paddle_size/2)));
+		ball_vspeed = ball_speed * sin(atan(ball_vspeed/ball_hspeed + (ball.y-player2.pos.y)/(player2.height/2)));
 		ball_hspeed = (ball_hspeed/abs(ball_hspeed)) * ball_speed * cos(asin(ball_vspeed/ball_speed));
 		
-		ball_x += ball_hspeed;
+		ball.x += ball_hspeed;
 	}
 	
 	//point marking!
-	if (ball_x <= 0)
+	if (ball.x <= 0)
 	{
 		play_sample(match_bleep,128,128,1000,0);
 		score_P2++;
-		left_paddle_size -= 2;
-		ball_x = SCREEN_W/2;
-		ball_y = SCREEN_H/2;
+		player1.height -= 2;
+		ball.x = SCREEN_W/2;
+		ball.y = SCREEN_H/2;
 	}
 	
-	if (ball_x >= SCREEN_W - 4)
+	if (ball.x >= SCREEN_W - 4)
 	{
 		play_sample(match_bleep,128,128,1000,0);
 		score_P1++;
-		right_paddle_size -= 2;
-		ball_x = SCREEN_W/2;
-		ball_y = SCREEN_H/2;
+		player2.height -= 2;
+		ball.x = SCREEN_W/2;
+		ball.y = SCREEN_H/2;
 	}
 
-	if ((left_paddle_size < 2) || (right_paddle_size < 2)) 
+	if ((player1.height < 2) || (player2.height < 2)) 
 	{
 		game_over = 1;
 	}
@@ -321,19 +332,19 @@ void game_loop()
 	if (!two_player)
 	{
 		//AI... not so smart, kay?
-		if (ball_hspeed > 0 && ball_x >= (SCREEN_W - SCREEN_W/4 * (ball_hspeed/ball_speed)))
+		if (ball_hspeed > 0 && ball.x >= (SCREEN_W - SCREEN_W/4 * (ball_hspeed/ball_speed)))
 		{
-			if (ball_y > (P2_y + right_paddle_size/2) && P2_y < (SCREEN_H - right_paddle_size/2))
-				P2_y += paddle_speed;
-			else if (ball_y < (P2_y - right_paddle_size/2) && P2_y > right_paddle_size/2)
-				P2_y -= paddle_speed;
+			if (ball.y > (player2.pos.y + player2.height/2) && player2.pos.y < (SCREEN_H - player2.height/2))
+				player2.pos.y += player2.speed;
+			else if (ball.y < (player2.pos.y - player2.height/2) && player2.pos.y > player2.height/2)
+				player2.pos.y -= player2.speed;
 		}
 	}
 
 	if( !game_over) {	
 		//Move ball	
-		ball_x += ball_hspeed;
-		ball_y += ball_vspeed;
+		ball.x += ball_hspeed;
+		ball.y += ball_vspeed;
 	}
 
 	output();
