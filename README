@@ -12,24 +12,20 @@ Building
 1. Make sure you have the following software installed:
 
    * C compiler
-   * cmake
    * make
-   * allegro5 library and header files
+   * allegro4 library and header files
 
-2. Run the following to create the Makefile from within the pong project 
-   directory
+2. Build the project
 
-   cmake .
-
-3. If no errors occured you can now build pong by running make
+   make
 
 
 Running
 -------
 
-1. Start pong by executing pong-1.0:
+1. Start pong by executing pong-1.1:
 
-   ./pong-1.0
+   ./pong-1.1
 
 
 Playing
