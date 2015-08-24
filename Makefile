@@ -10,7 +10,7 @@ all: pong
 
 #THE game
 pong: $(OBJ)
-	$(CC) $(CFLAGS) -o pong-$V $(OBJ) `allegro-config --libs`
+	$(CC) $(CFLAGS) -o pong-$V $(OBJ) -lm `allegro-config --libs`
 
 #object files
 main.o: src/main.c inc/engine.h
