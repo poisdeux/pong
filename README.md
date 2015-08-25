@@ -1,41 +1,36 @@
-Pong
-----
+# Pong
 
 Pong is one of the earliest arcade video games and the very first sports arcade
 video game. It was the first game developed by Atari Inc. and this is a version
 that runs on a GNU/Linux system.
 
 
-Building
---------
+# Building
 
 1. Make sure you have the following software installed:
-
-   * C compiler
-   * make
-   * allegro4 library and header files
+  * C compiler
+  * make
+  * allegro4 library and header files
 
 2. Build the project
 
-   make
+  `make`
 
 
-Running
--------
+# Running
+
 
 1. Start pong by executing pong-1.1:
 
-   ./pong-1.1
+  `./pong-1.1`
 
 
-Playing
--------
+# Playing
 
-Use the up and down arrow keys to move the bat.
+Use the up and down arrow keys to move the paddle.
 
+# Credits
 
-Credits
--------
+* Original author: Bruno Guedes (http://brazmogu.com.br/)
+* Updated for Git course: Martijn Brekhof <m.brekhof@gmail.com>
 
-Bruno Guedes (http://brazmogu.com.br/)
-Martijn Brekhof <m.brekhof@gmail.com>
