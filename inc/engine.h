@@ -1,6 +1,5 @@
 /**
  * Copyright 2008 Bruno Guedes
- * Copyright 2015 AT Computing
  *
  * This file is part of Pong.
  *
