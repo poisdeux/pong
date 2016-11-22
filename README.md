@@ -34,4 +34,4 @@ Use the up and down arrow keys to move the paddle.
 
 * Original author: Bruno Guedes (http://brazmogu.com.br/)
 * Updated for Git course: Martijn Brekhof <m.brekhof@gmail.com>
-
+* Me
