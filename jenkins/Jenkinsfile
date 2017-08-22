@@ -1,0 +1,16 @@
+pipeline {
+  agent { 
+    dockerfile {
+	additionalBuildArgs '-t pong'
+    }
+  }
+  stages {
+    stage('build') {
+        steps {
+            sh '''
+		make
+            '''
+        }
+    }
+  }
+}
