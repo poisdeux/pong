@@ -17,6 +17,7 @@ pipeline {
         steps {
             sh '''
                 Xvfb :0 &
+                export DISPLAY=:0.0
                 ./pong-1.1 &
                 PID=$!
                 if ps ${PID} > /dev/null 2>&1
