@@ -2,7 +2,7 @@ pipeline {
   agent { 
     dockerfile {
 	dir 'jenkins'
-	additionalBuildArgs '-t pong'
+	args '-u root:root'
     }
   }
   stages {
@@ -17,9 +17,10 @@ pipeline {
         steps {
             sh '''
                 for PKG in xdotool xvfb
+                do
                     if ! dpkg -s ${PKG} > /dev/null
                     then
-                        apt-get install ${PKG}
+                        apt-get install -y ${PKG}
                     fi
                 done
             '''
