@@ -13,19 +13,6 @@ pipeline {
             '''
         }
     }
-    stage('Setup X window system testing tools') {
-        steps {
-            sh '''
-                for PKG in xdotool xvfb
-                do
-                    if ! dpkg -s ${PKG} > /dev/null 2>&1
-                    then
-                        apt-get install -y ${PKG}
-                    fi
-                done
-            '''
-        }
-    }
     stage('Test if pong starts') {
         steps {
             sh '''
