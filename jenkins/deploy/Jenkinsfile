@@ -7,9 +7,10 @@ pipeline {
   }
   stages {
     stage('Copy artifacts from test') {
+        step([$class: 'CopyArtifact', filter: 'pong-1.1', fingerprintArtifacts: true, projectName: 'Pong-test', selector: [$class: 'StatusBuildSelector', stable: false], target: '/usr/bin/'])
         steps {
             sh '''
-                echo Copying
+                ls -l ./pong-1.1
             '''
         }
     }
