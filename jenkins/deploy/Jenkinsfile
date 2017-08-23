@@ -8,10 +8,10 @@ pipeline {
   stages {
     stage('Copy artifacts from test') {
         steps {
-            step([$class: 'CopyArtifact', filter: 'pong-1.1', fingerprintArtifacts: true, projectName: 'Pong-test', selector: [$class: 'StatusBuildSelector', stable: false], target: '/usr/bin/'])
+            step([$class: 'CopyArtifact', filter: 'pong-1.1', fingerprintArtifacts: true, projectName: 'Pong-test', selector: [$class: 'StatusBuildSelector', stable: false]])
             sh '''
-                ln -s /usr/bin/pong-1.1 /usr/bin/pong
-                ls -l /usr/bin/pong-1.1
+                mv pong-1.1 /usr/bin/pong
+                ls -l /usr/bin/pong
             '''
         }
     }
