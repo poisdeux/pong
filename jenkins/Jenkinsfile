@@ -13,5 +13,24 @@ pipeline {
             '''
         }
     }
+    stage('Setup X window system testing tools') {
+        steps {
+            sh '''
+                for PKG in xdotool xvfb
+                    if ! dpkg -s ${PKG} > /dev/null
+                    then
+                        apt-get install ${PKG}
+                    fi
+                done
+            '''
+        }
+    }
+    stage('test') {
+        steps {
+            sh '''
+                echo Testing
+            '''
+        }
+    }
   }
 }
