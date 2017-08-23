@@ -1,7 +1,7 @@
 pipeline {
   agent { 
     dockerfile {
-	dir 'jenkins'
+	dir 'jenkins/test'
 	args '-u root:root'
     }
   }
