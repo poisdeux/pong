@@ -1,0 +1,37 @@
+pipeline {
+  agent { 
+    dockerfile {
+	dir 'jenkins'
+	args '-u root:root'
+    }
+  }
+  stages {
+    stage('build') {
+        steps {
+            sh '''
+		make
+            '''
+        }
+    }
+    stage('Setup X window system testing tools') {
+        steps {
+            sh '''
+                for PKG in xdotool xvfb
+                do
+                    if ! dpkg -s ${PKG} > /dev/null
+                    then
+                        apt-get install -y ${PKG}
+                    fi
+                done
+            '''
+        }
+    }
+    stage('test') {
+        steps {
+            sh '''
+                echo Testing
+            '''
+        }
+    }
+  }
+}
