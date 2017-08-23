@@ -18,7 +18,7 @@ pipeline {
             sh '''
                 for PKG in xdotool xvfb
                 do
-                    if ! dpkg -s ${PKG} > /dev/null
+                    if ! dpkg -s ${PKG} > /dev/null 2>&1
                     then
                         apt-get install -y ${PKG}
                     fi
@@ -26,12 +26,44 @@ pipeline {
             '''
         }
     }
-    stage('test') {
+    stage('Test if pong starts') {
         steps {
             sh '''
-                echo Testing
+                Xvfb :0 &
+                ./pong-1.1 &
+                PID=$!
+                if ps ${PID} > /dev/null 2>&1
+                then
+                    sleep 1
+                    kill ${PID}
+                else
+                    exit 1
+                fi
             '''
         }
+    }
+    stage('Run unit tests') {
+        steps {
+            sh '''
+                echo Unit testing
+            '''
+        }
+    }
+    stage('Run integration tests') {
+        steps {
+            sh '''
+                echo Unit testing
+            '''
+        }
+
+    }
+    stage('Run acceptance tests') {
+        steps {
+            sh '''
+                echo Unit testing
+            '''
+        }
+
     }
   }
 }
