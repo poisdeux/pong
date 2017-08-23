@@ -51,5 +51,10 @@ pipeline {
         }
 
     }
+    stage('Archiving artificacts') {
+        steps {
+            archiveArtifacts artifacts: 'pong-1.1', fingerprint: true, onlyIfSuccessful: true
+        }
+    }
   }
 }
