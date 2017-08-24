@@ -1,0 +1,11 @@
+node {
+  checkout scm
+  stage('Building test image') {
+    def newApp = docker.build "poisdeux/pong:latest-test"
+  stage('Test image') {
+    // run some tests on it (see below), then if everything looks good:
+  }
+  stage('Push image') {
+    newApp.push()
+  }
+}
