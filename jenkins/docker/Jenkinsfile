@@ -4,15 +4,31 @@ node {
   stage('Building test image') {
     newApp = docker.build("poisdeux/pong:latest-test", "jenkins/test")
   }
-  stage('Test image') {
+  stage('Testing test image') {
     checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']],
      userRemoteConfigs: [[url:   
          'https://github.com/poisdeux/pong.git']]])
     sh '''
-        ls -l
+        make
     '''
   }
-  stage('Push image') {
+  stage('Publish test image') {
     newApp.push()
   }
+
+  stage('Building production image') {
+    newApp = docker.build("poisdeux/pong:latest-prod", "jenkins/prod")
+  }
+  stage('Testing production image') {
+    checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']],
+     userRemoteConfigs: [[url:   
+         'https://github.com/poisdeux/pong.git']]])
+    sh '''
+        make
+    '''
+  }
+  stage('Publish production image') {
+    newApp.push()
+  }
+
 }
