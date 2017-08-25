@@ -5,12 +5,13 @@ node {
     newApp = docker.build("poisdeux/pong:latest-test", "jenkins/test")
   }
   stage('Testing test image') {
-    checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']],
-     userRemoteConfigs: [[url:   
-         'https://github.com/poisdeux/pong.git']]])
-    sh '''
-        make
-    '''
+    newApp.inside {
+      checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']],
+        userRemoteConfigs: [[url: 'https://github.com/poisdeux/pong.git']]])
+      sh '''
+          make
+      '''
+    }
   }
   stage('Publish test image') {
     newApp.push()
@@ -20,15 +21,13 @@ node {
     newApp = docker.build("poisdeux/pong:latest-prod", "jenkins/prod")
   }
   stage('Testing production image') {
-    checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']],
-     userRemoteConfigs: [[url:   
-         'https://github.com/poisdeux/pong.git']]])
-    sh '''
-        make
-    '''
+    newApp.inside {
+      sh '''
+        dpkg -s liballegro4.4
+      '''
+    }
   }
   stage('Publish production image') {
     newApp.push()
   }
-
 }
