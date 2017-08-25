@@ -1,5 +1,5 @@
-def newApp
 node {
+  def newApp
   checkout scm
   stage('Building test image') {
     newApp = docker.build("poisdeux/pong:latest-test", "jenkins/test")
