@@ -5,7 +5,12 @@ node {
     newApp = docker.build("poisdeux/pong:latest-test", "jenkins/test")
   }
   stage('Test image') {
-    // run some tests on it (see below), then if everything looks good:
+    checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']],
+     userRemoteConfigs: [[url:   
+         'https://github.com/poisdeux/pong.git']]])
+    sh '''
+        ls -l
+    '''
   }
   stage('Push image') {
     newApp.push()
