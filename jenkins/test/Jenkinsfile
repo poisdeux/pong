@@ -54,7 +54,7 @@ pipeline {
     stage('Report coverage') {
         steps {
             sh '''
-                
+                gcovr --branches --xml-pretty -r . -o pong-coverage.xml                
             '''
         }
     }
