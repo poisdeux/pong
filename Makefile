@@ -1,6 +1,6 @@
 ﻿CC = gcc
 ALLEGROLIBS = `allegro-config --cflags`
-CFLAGS = -I/usr/include -I./inc -Wall $(ALLEGROLIBS)
+override CFLAGS += -I/usr/include -I./inc -Wall $(ALLEGROLIBS)
 DEBUG = -pg -ggdb
 OBJ = engine.o main.o
 V = 1.1
