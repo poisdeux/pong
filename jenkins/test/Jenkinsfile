@@ -1,7 +1,7 @@
 pipeline {
   agent { 
-    dockerfile {
-	dir 'jenkins/test'
+    docker {
+        image 'poisdeux/pong:latest-test'
 	args '-u root:root'
     }
   }
